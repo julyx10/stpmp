@@ -1,28 +1,27 @@
 <!--index.wxml-->
-<navigation-bar title="Weixin" back="{{false}}" color="black" background="#FFF"></navigation-bar>
-<scroll-view class="scrollarea" scroll-y type="list">
-  <view class="container">
-    <view class="userinfo">
-      <block wx:if="{{canIUseNicknameComp && !hasUserInfo}}">
-        <button class="avatar-wrapper" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
-          <image class="avatar" src="{{userInfo.avatarUrl}}"></image>
-        </button>
-        <view class="nickname-wrapper">
-          <text class="nickname-label">昵称</text>
-          <input type="nickname" class="nickname-input" placeholder="请输入昵称" bind:change="onInputChange" />
-        </view>
-      </block>
-      <block wx:elif="{{!hasUserInfo}}">
-        <button wx:if="{{canIUseGetUserProfile}}" bindtap="getUserProfile"> 获取头像昵称 </button>
-        <view wx:else> 请使用2.10.4及以上版本基础库 </view>
-      </block>
-      <block wx:else>
-        <image bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
-        <text class="userinfo-nickname">{{userInfo.nickName}}</text>
-      </block>
-    </view>
-    <view class="usermotto">
-      <text class="user-motto">{{motto}}</text>
-    </view>
+
+<!-- user panel -->
+<view class= "user-panel">
+  <!-- avatar and nikename -->
+  <view class="user-panel-avatar" bind:tap="tapAvatar">
+    <image src= "{{userInfo.avatar}}" mode="scaleToFill"></image>
+    <text>{{userInfo.nickName}}</text>
   </view>
-</scroll-view>
+  <!-- menu -->
+  <view class="user-panel-menu" bind:tap="tapMenu">
+    <text>TEST</text>
+  </view>
+</view>
+
+<!-- model view -->
+<view class="model-view">
+  <view style="height: 100%; width: 100%;" bindtouchstart="documentTouchStart" bindtouchmove="documentTouchMove" bindtouchend="documentTouchEnd" >
+    <canvas type="webgl" id="c" style="width: 100%; height:100%;" bindtouchstart="touchStart" bindtouchmove="touchMove" bindtouchend="touchEnd" bindtouchcancel="touchCancel" bindlongtap="longTap" bindtap="tap"></canvas>
+</view>
+
+</view> 
+
+<!-- status panel -->
+<view class="status-view">
+  <text>status bar</text>
+</view>

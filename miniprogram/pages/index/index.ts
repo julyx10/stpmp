@@ -1,54 +1,89 @@
-// index.ts
-// 获取应用实例
-const app = getApp<IAppOption>()
-const defaultAvatarUrl = 'https://mmbiz.qpic.cn/mmbiz/icTdbqWNOwNRna42FI242Lcia07jQodd2FJGIYQfG0LAJGFxM4FbnQP6yfMxBgJ0F3YRqJCJ1aPAK2dQagdusBZg/0'
+import * as THREE from '../../libs/three.weapp.min'
+import { OrbitControls } from '../../jsm/controls/OrbitControls'
 
-Component({
-  data: {
-    motto: 'Hello World',
-    userInfo: {
-      avatarUrl: defaultAvatarUrl,
-      nickName: '',
-    },
-    hasUserInfo: false,
-    canIUseGetUserProfile: wx.canIUse('getUserProfile'),
-    canIUseNicknameComp: wx.canIUse('input.type.nickname'),
-  },
-  methods: {
-    // 事件处理函数
-    bindViewTap() {
-      wx.navigateTo({
-        url: '../logs/logs',
-      })
-    },
-    onChooseAvatar(e: any) {
-      const { avatarUrl } = e.detail
-      const { nickName } = this.data.userInfo
-      this.setData({
-        "userInfo.avatarUrl": avatarUrl,
-        hasUserInfo: nickName && avatarUrl && avatarUrl !== defaultAvatarUrl,
-      })
-    },
-    onInputChange(e: any) {
-      const nickName = e.detail.value
-      const { avatarUrl } = this.data.userInfo
-      this.setData({
-        "userInfo.nickName": nickName,
-        hasUserInfo: nickName && avatarUrl && avatarUrl !== defaultAvatarUrl,
-      })
-    },
-    getUserProfile() {
-      // 推荐使用wx.getUserProfile获取用户信息，开发者每次通过该接口获取用户个人信息均需用户确认，开发者妥善保管用户快速填写的头像昵称，避免重复弹窗
-      wx.getUserProfile({
-        desc: '展示用户信息', // 声明获取用户个人信息后的用途，后续会展示在弹窗中，请谨慎填写
-        success: (res) => {
-          console.log(res)
-          this.setData({
-            userInfo: res.userInfo,
-            hasUserInfo: true
-          })
+Page({
+  data: {},
+  onLoad: function () {
+    wx.createSelectorQuery()
+      .select('#c')
+      .node()
+      .exec((res) => {
+        const canvas = THREE.global.registerCanvas(res[0].node)
+        
+        this.setData({ canvasId: canvas._canvasId })
+
+        const camera = new THREE.PerspectiveCamera(70, canvas.width / canvas.height, 1, 1000);
+        camera.position.z = 500;
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xaaaaaa);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+      
+        const controls = new OrbitControls(camera, renderer.domElement);
+        // controls.enableDamping = true;
+        // controls.dampingFactor = 0.25;
+        // controls.enableZoom = false;
+        camera.position.set(200, 200, 500);
+        controls.update();
+        const geometry = new THREE.BoxBufferGeometry(100, 200, 200);
+      
+        const texture = new THREE.TextureLoader().load('../../image/logo.png');
+        const material = new THREE.MeshBasicMaterial({ map: texture });
+      
+        // const material = new THREE.MeshBasicMaterial({ color: 0x44aa88 });
+        const mesh = new THREE.Mesh(geometry, material);
+        scene.add(mesh);
+      
+        // renderer.setPixelRatio(wx.getSystemInfoSync().pixelRatio);
+        // renderer.setSize(canvas.width, canvas.height);
+      
+        function onWindowResize() {
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(canvas.width, canvas.height);
         }
+        function render() {
+          canvas.requestAnimationFrame(render);
+          // mesh.rotation.x += 0.005;
+          // mesh.rotation.y += 0.01;
+          controls.update();
+          renderer.render(scene, camera);
+        }
+
+        render()
+
       })
-    },
+  },
+  onUnload: function () {
+    THREE.global.unregisterCanvas(this.data.canvasId)
+  },
+  touchStart(e: any) {
+    console.log('canvas', e)
+    THREE.global.touchEventHandlerFactory('canvas', 'touchstart')(e)
+  },
+  touchMove(e: any) {
+    console.log('canvas', e)
+    THREE.global.touchEventHandlerFactory('canvas', 'touchmove')(e)
+  },
+  touchEnd(e: any) {
+    console.log('canvas', e)
+    THREE.global.touchEventHandlerFactory('canvas', 'touchend')(e)
+  },
+  touchCancel(e: any) {
+    // console.log('canvas', e)
+  },
+  longTap(e: any) {
+    // console.log('canvas', e)
+  },
+  tap(e: any) {
+    // console.log('canvas', e)
+  },
+  documentTouchStart(e: any) {
+    // console.log('document',e)
+  },
+  documentTouchMove(e: any) {
+    // console.log('document',e)
+  },
+  documentTouchEnd(e: any) {
+    // console.log('document',e)
   },
 })
